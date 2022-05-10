@@ -59,7 +59,10 @@ def main(*unused_argv):
                 # If the worker is dead, make sure that any videos that are waiting are redirected to the next worker
                 if request.args["worker_status"] != "ok":
                     for video_id in videos:
-                        if metadata[video_id]["status"] == "downloading":
+                        if (
+                            metadata[video_id]["status"] == "downloading"
+                            and metadata[video_id]["worker_id"] == worker_id
+                        ):
                             metadata[video_id]["status"] = "waiting"
 
                 return flask.jsonify({"finished": True})

@@ -47,11 +47,14 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
     # Default download options
     ydl_opts = {
         "format": "best",
-        "write-sub": True,
-        "write-description": True,
-        "write-all-tumbnails": True,
-        "yes-playlist": True,
-        "geo-bypass": True,
+        "allsubtitles": True,
+        "writesubtitles": True,
+        "writeautomaticsub": True,
+        "writedescription": True,
+        "writeinfojson": True,
+        "writeannotations": True,
+        "writethumbnail": True,
+        "geo_bypass": True,
         "outtmpl": "./videodata/%(title)s.%(ext)s",
         "quiet": True,
     }
@@ -96,6 +99,7 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
     if "postprocessing" in video_data:
         subprocess.call(f'ffmpeg -i {video_filename} {video_data["postprocessing"]}', shell=True)
         if "postprocessing_output" in video_data:
+            os.remove(video_filename)
             video_filename = video_data["postprocessing_output"]
             # Move the file to the correct location
             os.rename(video_filename, f"./videodata/{video_filename}")

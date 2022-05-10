@@ -154,21 +154,26 @@ def _start_worker(
 
 
 def _poll_server_status(external_server_ip: str) -> bool:
-    with contextlib.suppress(Exception):
-        try:
-            # Get the status from the server
-            status = requests.get(f"http://{external_server_ip}/status", timeout=1).json()
+    try:
+        # Get the status from the server
+        status = requests.get(f"http://{external_server_ip}/status", timeout=1)
+        if status.status_code == 200:
+            stat = status.json()
             logging.info(
-                f'Finished {status["finished"]}/{status["total"]} ({status["errored"]} errored, {status["failed"]} failed, {status["downloading"]} downloading)'
+                f'Finished {stat["finished"]}/{stat["total"]} ({stat["failed"]} failed, {stat["skipped"]} skipped, {stat["downloading"]} downloading)'
             )
-            for k, v in status["workers"].items():
+            for k, v in stat["workers"].items():
                 if v["status"] != "ok":
                     logging.error(f"Worker {k} failed: {v['status']}")
-            if status["done"]:
+            if stat["done"]:
                 logging.info("Finished processing!")
                 return False
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            logging.info("The server is not yet live... Retrying in 5s")
+        else:
+            logging.error("Server returned status code %s", status.status_code)
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        logging.info("The server is not yet live... Retrying in 5s")
+    except Exception as ex:
+        logging.error("Error polling server: %s", str(ex))
     return True
 
 
