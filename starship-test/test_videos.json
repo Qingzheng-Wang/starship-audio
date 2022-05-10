@@ -1,0 +1,11 @@
+[
+    {
+        "url": "https://www.youtube.com/watch?v=BaW_jenozKcj",
+        "output_path": "test",
+        "postprocessing": "-vf scale=1280:720 -c:a copy video.mp4",
+        "postprocessing_output": "video.mp4",
+        "ytdl_opts": {
+            "outtmpl": "./videodata/tmp.%(ext)s"
+        }
+    }
+]
