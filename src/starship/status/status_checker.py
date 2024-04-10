@@ -3,8 +3,9 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-import requests
 import time
+
+import requests
 from absl import app, flags, logging
 
 flags.DEFINE_string("server_ip", None, "The IP of the server to connect to")

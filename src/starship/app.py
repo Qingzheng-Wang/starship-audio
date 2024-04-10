@@ -3,11 +3,12 @@ Main app for starship - a client designed to fetch YouTube videos at scale.
 """
 
 import atexit
-import contextlib
 import json
+import os
+import sys
 import time
 from collections import defaultdict
-from typing import Any, Dict, List, Callable, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import requests
 from absl import app, flags, logging
@@ -75,14 +76,14 @@ def _discover_running_instances(compute: Any, project: str, zones: List[str]) ->
                     logging.error(
                         "Starship is already running in zone %s. Make sure it is done running, and try again.", zone
                     )
-                    exit(1)
+                    sys.exit(1)
             logging.info("Zone %s has no running starship instances. Continuing...", zone)
         else:
             logging.info("Zone %s has no running instances. Continuing...", zone)
 
 
 def _load_data_from_file(filepath: str, data_type: str) -> List[Dict[str, Any]]:
-    with open(filepath, "r") as f:
+    with open(filepath) as f:
         if data_type == "file_list":
             return [
                 {
@@ -200,6 +201,8 @@ def _cleanup_instances(compute: Any, project: str, zones: str, run_name: str) ->
 
 
 def main(*unused_argv) -> None:
+    # Set the environment variable for the google application credentials
+    os.environ["GCLOUD_PROJECT"] = FLAGS.gcp_project
 
     # Construct the google API client for compute and storage
     compute = discovery.build("compute", "v1", cache_discovery=False)
@@ -273,6 +276,10 @@ def main(*unused_argv) -> None:
     atexit.unregister(exit_handler)
 
     logging.info("Finished.")
+
+
+def cli():
+    app.run(main)
 
 
 if __name__ == "__main__":

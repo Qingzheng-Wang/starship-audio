@@ -1,4 +1,5 @@
 import time
+import os
 
 from absl import logging
 
@@ -24,8 +25,8 @@ def create_instance(
     source_disk_image = image_response["selfLink"]
 
     # Configure the machine
-    machine_type_internal = "zones/{}/machineTypes/{}".format(zone, machine_type)
-    with open(startup_script_file, "r") as startup_file:
+    machine_type_internal = f"zones/{zone}/machineTypes/{machine_type}"
+    with open(startup_script_file) as startup_file:
         startup_script = startup_file.read()
 
     if metadata is None:
@@ -60,14 +61,14 @@ def create_instance(
         # internet.
         "networkInterfaces": [
             {
-                "network": "global/networks/default",
+                "network": os.getenv("STARSHIP_GCP_NETWORK", "global/networks/default"),
                 "accessConfigs": [{"type": "ONE_TO_ONE_NAT", "name": "External NAT"}],
             }
         ],
         # Allow the instance to access cloud storage and logging.
         "serviceAccounts": [
             {
-                "email": "default",
+                "email": os.getenv("STARSHIP_GCP_SERVICE_ACCOUNT", "default"),
                 "scopes": [
                     "https://www.googleapis.com/auth/devstorage.read_write",
                     "https://www.googleapis.com/auth/logging.write",

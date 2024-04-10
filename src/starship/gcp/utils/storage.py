@@ -5,8 +5,9 @@ Google cloud storage utilities.
 import google.cloud.storage.client
 
 
-def upload_file_to_gcp(storage_client: google.cloud.storage.client.Client, bucket: str, bucket_path: str,
-                       local_file_path: str) -> None:
+def upload_file_to_gcp(
+    storage_client: google.cloud.storage.client.Client, bucket: str, bucket_path: str, local_file_path: str
+) -> None:
     """
     Upload a file to GCP.
 
@@ -19,5 +20,5 @@ def upload_file_to_gcp(storage_client: google.cloud.storage.client.Client, bucke
     :param local_file_path: The local file path to upload the file to
     :type local_file_path: str
     """
-    with open(local_file_path, 'rb') as input_file:
+    with open(local_file_path, "rb") as input_file:
         storage_client.get_bucket(bucket).blob(bucket_path).upload_from_file(input_file)

@@ -1,6 +1,65 @@
+[project]
+name = 'starship'
+version = '0.0.1'
+description = 'Distributed Video Downloader for Google Cloud Platform'
+authors = [{ name = 'David Chan', email = 'davidchan@berkeley.edu' }]
+license = { file = "LICENSE" }
+requires-python = ">=3.8.0"
+readme = "README.md"
+keywords = ["distributed", "gcp", "download", "video"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Development Status :: 3 - Alpha",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed",
+]
+dependencies = [
+  "absl-py~=2.1",
+  "google-cloud-storage~=2.16",
+  "google-api-python-client~=2.125",
+]
+
+[project.urls]
+homepage = "https://github.com/DavidMChan/starship"
+documentation = "https://github.com/DavidMChan/starship"
+repository = "https://github.com/DavidMChan/starship"
+
+[project.scripts]
+starship = "starship.app:cli"
+
+[tool.setuptools.package-data]
+"*" = [
+  "*.txt",
+  "*.rst",
+  "*.md",
+  "*.yaml",
+  "*.yml",
+  "*.json",
+  "*.html",
+  "*.css",
+  "*.js",
+  "*.png",
+  "*.jpg",
+  "*.jpeg",
+  "*.gif",
+  "*.ico",
+  "*.eot",
+  "*.woff",
+  "*.woff2",
+  "*.ttf",
+  "*.svg",
+  "*.otf",
+]
+
+
 [tool.black]
 line-length = 120
-target_version =['py38']
 exclude = '''
 
 (
@@ -20,11 +79,11 @@ exclude = '''
 '''
 
 [tool.isort]
-sections="FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.mypy]
@@ -34,3 +93,34 @@ disallow_untyped_decorators = true
 disallow_untyped_calls = true
 no_implicit_optional = true
 ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 120
+target-version = 'py38'
+select = ["E", "F", "I", "N", "UP", "PL", "NPY", "RUF", "C90"]
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+]
+ignore = ["E501", "PLR0913", "N806", "N803", "N812", "N802"]
+
+[tool.pyright]
+reportGeneralTypeIssues = false

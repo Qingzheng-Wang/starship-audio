@@ -1,14 +1,15 @@
 import json
 import os
-import subprocess
 import shutil
+import subprocess
+import sys
 import time
+from typing import Any, Dict
 
 import requests
-import youtube_dl
 from absl import app, flags, logging
-from typing import Dict, Any
 from google.cloud import storage
+from yt_dlp import YoutubeDL
 
 flags.DEFINE_string("server_ip", None, "The IP of the server to connect to")
 flags.DEFINE_string("bucket", None, "The GCP bucket to upload to")
@@ -60,13 +61,21 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
     }
 
     logging.info("Downloading %s", video_data["_id"])
+    logging.info(video_data)
 
     # Override the download options if it's requested
     if "ytdl_opts" in video_data:
         ydl_opts.update(video_data["ytdl_opts"])
 
-    with youtube_dl.YoutubeDL(ydl_opts) as downloader:
-        res = downloader.extract_info(str(video_data["url"]), download=True)
+    error_message = "Could not download video for an unknown reason"
+    try:
+        with YoutubeDL(ydl_opts) as downloader:
+            res = downloader.extract_info(str(video_data["url"]), download=True)
+    except Exception as e:
+        logging.error(f"Failed to extract video info: {e}")
+        error_message = str(e)
+        res = None
+
     if res is None:
         logging.error("Failed to download %s", video_data["video_id"])
         try:
@@ -74,9 +83,10 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
                 f"http://{FLAGS.server_ip}/next_video",
                 json={
                     "video_id": video_data["_id"],
-                    "status": "error",
+                    "status": "skipped",
                     "error": "Could not download video",
                     "worker_id": FLAGS.instance_name,
+                    "worker_message": error_message,
                 },
             )
         except Exception as e:
@@ -85,7 +95,7 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
         return
 
     # Write the metadata
-    with open(f"./videodata/meta.json", "w") as jf:
+    with open("./videodata/meta.json", "w") as jf:
         json.dump(res, jf)
 
     # Do any processing required
@@ -139,17 +149,23 @@ def main(*unused_argv):
     else:
         storage_client = storage.Client()
     worker_status = "ok"
+    worker_message = ""
 
     while True:
         try:
             next_video_data = requests.get(
-                f"http://{FLAGS.server_ip}/next_video?worker_id={worker_id}&worker_status={worker_status}"
+                f"http://{FLAGS.server_ip}/next_video?worker_id={worker_id}&worker_status={worker_status}&worker_message={worker_message}"
             )
             try:
                 next_video_data = next_video_data.json()
             except json.decoder.JSONDecodeError:
                 logging.error(f"Failed to decode JSON from server: {next_video_data.text}")
-                exit(1)
+                sys.exit(1)
+
+            if "pending_finish" in next_video_data and next_video_data["pending_finish"]:
+                logging.info(f"Worker {worker_id} is pending_finish")
+                time.sleep(5)
+                continue
 
             if "finished" in next_video_data and next_video_data["finished"]:
                 logging.info(f"Worker {worker_id} is finished")
@@ -160,12 +176,13 @@ def main(*unused_argv):
             except Exception as e:
                 logging.error(f"Failed to download video: {e}")
                 worker_status = "error"
+                worker_message = str(e)
                 continue
 
         except requests.exceptions.ConnectionError:
             logging.error("Failed to connect to server")
             time.sleep(5)
-        except Exception as ex:
+        except Exception:
             worker_status = "error"
 
 

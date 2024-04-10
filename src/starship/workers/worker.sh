@@ -7,9 +7,7 @@ sudo apt update
 sudo apt install -y python3 python3-pip ffmpeg
 
 # Install the dependencies
-pip3 install absl-py requests google-cloud-storage youtube-dl
-pip3 install --upgrade six
-pip3 install --upgrade youtube-dl
+pip3 install absl-py requests google-cloud-storage yt-dlp
 
 # Download the youtube-dl repo, and patch the correct branch to fix the chapter extraction
 # git clone https://github.com/ytdl-org/youtube-dl.git
@@ -22,7 +20,8 @@ pip3 install --upgrade youtube-dl
 INSTANCE_NAME=$(curl http://metadata/computeMetadata/v1/instance/attributes/iname -H "Metadata-Flavor: Google")
 CS_BUCKET=$(curl http://metadata/computeMetadata/v1/instance/attributes/bucket -H "Metadata-Flavor: Google")
 SERVER_IP=$(curl http://metadata/computeMetadata/v1/instance/attributes/serverip -H "Metadata-Flavor: Google")
-FOLDER=$(curl http://metadata/computeMetadata/v1/instance/attributes/folder -H "Metadata-Flavor: Google")
+FOLDER=$(curl http://metadata/computeMetadata/v1/instance/attributes/folder -H "Metadata-Flavor: Google")]
+GCLOUD_PROJECT=$(curl http://metadata/computeMetadata/v1/project/project-id -H "Metadata-Flavor: Google")
 
 # Fetch the server script
 gsutil cp gs://$CS_BUCKET/worker.py worker.py

@@ -7,7 +7,7 @@ sudo apt update
 sudo apt install -y python3 python3-pip
 
 # Install the dependencies
-pip3 install flask absl-py requests
+pip3 install flask absl-py requests APScheduler
 
 # Use the metadata server to get the configuration specified during
 # instance creation. Read more about metadata here:

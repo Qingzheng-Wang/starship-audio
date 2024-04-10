@@ -23,9 +23,6 @@ def local_relpath(local_filepath: str, target_relative_filepath: str) -> str:
     return os.path.join(os.path.dirname(os.path.abspath(local_filepath)), target_relative_filepath)
 
 
-
-
-
 def random_string(length: int, letters: str = string.ascii_lowercase) -> str:
     """
     Return a random string.
@@ -37,4 +34,4 @@ def random_string(length: int, letters: str = string.ascii_lowercase) -> str:
     :return: The random string
     :rtype: str
     """
-    return ''.join(random.choice(letters) for i in range(length))
+    return "".join(random.choice(letters) for i in range(length))
