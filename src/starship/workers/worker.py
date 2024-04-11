@@ -77,7 +77,7 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
         res = None
 
     if res is None:
-        logging.error("Failed to download %s", video_data["video_id"])
+        logging.error("Failed to download %s", video_data["_id"])
         try:
             requests.post(
                 f"http://{FLAGS.server_ip}/next_video",
