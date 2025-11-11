@@ -48,6 +48,7 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
     # Default download options
     ydl_opts = {
         "format": "best",
+        'outtmpl': str("audiodata/%(id)s.%(ext)s"),
         "allsubtitles": True,
         "writesubtitles": True,
         "writeautomaticsub": True,
@@ -56,7 +57,6 @@ def _download_video_to_gcp(video_data: Dict[str, Any], storage_client: Any, buck
         "writeannotations": True,
         "writethumbnail": True,
         "geo_bypass": True,
-        "outtmpl": "./videodata/%(title)s.%(ext)s",
         "quiet": True,
     }
 
