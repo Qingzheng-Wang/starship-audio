@@ -1,14 +1,14 @@
-# Starship
+# Starship-Audio
 
-Starship is an auto-scaling GCP-based video download tool, which spins up a server instance, and multiple worker
-instances for faster downloading of video.
+Starship-Audio is an auto-scaling GCP-based audio download tool, which spins up a server instance, and multiple worker
+instances for faster downloading of audio.
 
 ## Usage
 
-To use starship, make sure you are authorized with GCP (you can run gsutil commands from the terminal) and be sure that
+To use starship-audio, make sure you are authorized with GCP (you can run gsutil commands from the terminal) and be sure that
 the local machine has been added to the firewall exceptions on GCP (for polling the server instance).
 
-Next, follow the File Input Format instructions below to create a JSON file describing the videos to be downloaded.
+Next, follow the File Input Format instructions below to create a JSON file describing the audio files to be downloaded.
 
 Finally, create a GCP bucket. This is where the final data will be dumped (as well as some
 additional files for communication between the processes).
@@ -16,7 +16,7 @@ additional files for communication between the processes).
 Then, you can run the command below to launch a download instance:
 
 ```bash
->> python app.py --gcp_project=[YOUR PROJECT NAME] --num_workers=408 --input=data.json --zones=us-east1-b,us-east4-c,us-west2-a,europe-west1-b,europe-west2-a,europe-west4-a --max_workers_per_zone=68 --bucket=[YOUR BUCKET NAME]
+>> python -m starship.app_audio --gcp_project=your_project --num_workers=408 --input=data.json --zones=us-central1,us-east1,us-west1,us-west2,us-west3,us-west4 --max_workers_per_zone=68 --bucket=your_bucket
 ```
 
 The above command will launch a download with 408 workers and 1 server instance spread across six compute zones, with
@@ -35,7 +35,7 @@ The files should be input in a JSON file with the following format:
         "postprocessing": "(optional) ffmpeg -i <what you would put here>",
         "postprocessing_output": "(optional) if you have a -o in postprocessing, what that is",
         "ytdl_opts": {
-            "outtmpl": "(optional) Note: Outtmpl must start with ./videodata/",
+            "outtmpl": "(optional) Note: Outtmpl must start with ./audiodata/",
             "...": "(Optional) Overrides for ytdl download process"
         }
     }
